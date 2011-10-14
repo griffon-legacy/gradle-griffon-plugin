@@ -1,0 +1,41 @@
+import org.apache.ivy.util.url.CredentialsStore
+
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+isSnapshot = version.endsWith("SNAPSHOT")
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    compile gradleApi(), "org.codehaus.griffon:griffon-launcher:1.0.0-SNAPSHOT"
+    groovy fileTree(dir: new File(gradle.gradleHomeDir, 'lib'), includes: ['**/groovy-all-*.jar'])
+}
+
+uploadArchives {
+    repositories {
+        project.deployer = repositories.mavenDeployer {
+			project.deployer = repositories.mavenDeployer {
+			    def username = project.properties["codehausUsername"] ?: ''
+			    def password = project.properties["codehausPassword"] ?: ''
+
+			    uploadDescriptor = true
+			    repository(url: codehausReleaseUrl) {
+			        authentication(userName: codehausUsername, password: codehausPassword)
+			    }
+			    snapshotRepository(url: codehausSnapshotUrl) {
+			        uniqueVersion = true
+			        authentication(userName: codehausUsername, password: codehausPassword)
+			    }
+			}
+
+        }
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = "0.9.2"
+}

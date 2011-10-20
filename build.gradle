@@ -11,27 +11,64 @@ repositories {
 }
 
 dependencies {
-    compile gradleApi(), "org.codehaus.griffon:griffon-launcher:1.0.0-SNAPSHOT"
+    compile gradleApi(), "org.codehaus.griffon:griffon-launcher:1.0.0"
     groovy fileTree(dir: new File(gradle.gradleHomeDir, 'lib'), includes: ['**/groovy-all-*.jar'])
 }
 
+project.poms = [project.install.repositories.mavenInstaller.pom]
 uploadArchives {
-    repositories {
-        project.deployer = repositories.mavenDeployer {
-			project.deployer = repositories.mavenDeployer {
-			    def username = project.properties["codehausUsername"] ?: ''
-			    def password = project.properties["codehausPassword"] ?: ''
+    project.deployer = repositories.mavenDeployer {
+        def username = project.properties["codehausUsername"] ?: ''
+        def password = project.properties["codehausPassword"] ?: ''
 
-			    uploadDescriptor = true
-			    repository(url: codehausReleaseUrl) {
-			        authentication(userName: codehausUsername, password: codehausPassword)
-			    }
-			    snapshotRepository(url: codehausSnapshotUrl) {
-			        uniqueVersion = true
-			        authentication(userName: codehausUsername, password: codehausPassword)
-			    }
-			}
+        uploadDescriptor = true
+        repository(url: codehausReleaseUrl) {
+            authentication(userName: codehausUsername, password: codehausPassword)
+        }
+        snapshotRepository(url: codehausSnapshotUrl) {
+            uniqueVersion = true
+            authentication(userName: codehausUsername, password: codehausPassword)
+        }
+    }
+    project.poms << project.deployer.pom
+}
 
+project.pomModifications = []
+project.modifyPom = { Closure modification -> project.pomModifications << modification }
+project.poms*.whenConfigured { pom ->
+    project.pomModifications.each { modification ->
+        pom.project {
+            modification.delegate = delegate
+            modification.resolveStrategy = Closure.DELEGATE_FIRST
+            modification()
+        }
+    }
+}
+
+project.modifyPom {
+    name "Griffon Gradle plugin"
+    description project.description
+    url "http://griffon.codehaus.org"
+    inceptionYear "2011"
+    licenses {
+        license {
+            name 'The Apache Software License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution 'repo'
+        }
+    }
+    scm {
+        url "https://github.com/griffon/griffon-gradle-plugin/"
+    }
+    developers {
+        [aalmiray: "Andres Almiray"].each { devId, devName ->
+            developer {
+                id devId
+                name devName
+                roles {
+                    role "Developer"
+                }
+            }
         }
     }
 }

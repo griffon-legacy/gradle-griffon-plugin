@@ -6,11 +6,11 @@ This plugin for Gradle allows you to build Griffon projects. To use it, simply i
     buildscript {
         repositories {
             mavenCentral()
-            mavenRepo urls: "http://repository.jboss.org/maven2/"
+            mavenRepo urls: "http://repository.codehaus.org/"
         }
 
         dependencies {
-            classpath "org.codehaus.griffon:griffon-gradle-plugin:1.0",
+            classpath "org.codehaus.griffon:griffon-gradle-plugin:1.0.0",
                       "org.codehaus.griffon:griffon-scripts:0.9.4"
         }
     }

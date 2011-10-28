@@ -6,7 +6,10 @@ This plugin for Gradle allows you to build Griffon projects. To use it, simply i
     buildscript {
         repositories {
             mavenCentral()
-            mavenRepo urls: "http://repository.codehaus.org/"
+            mavenRepo name: 'Codehaus', url: 'http://repository.codehaus.org/'
+            mavenRepo name: 'Grails Central', url: 'http://repo.grails.org/grails/core/'
+            mavenRepo name: 'SpringSource', url: 'http://repository.springsource.com/maven/bundles/release'
+            mavenRepo name: 'JavaNet', url: 'http://download.java.net/maven/2/'
         }
 
         dependencies {
@@ -22,7 +25,7 @@ This plugin for Gradle allows you to build Griffon projects. To use it, simply i
 
     repositories {
         mavenCentral()
-        mavenRepo urls: "http://repository.jboss.org/maven2/"
+        mavenRepo name: 'Codehaus', url: 'http://repository.codehaus.org/'
     }
 
     dependencies {

@@ -16,10 +16,17 @@ class GriffonPlugin implements Plugin<Project> {
             runtime.extendsFrom compile
             test.extendsFrom compile
             
-            bootstrap.extendsFrom logging
+            bootstrap//.extendsFrom logging
             bootstrapRuntime.extendsFrom bootstrap, runtime
         }
 
+        project.repositories {
+            mavenRepo name: 'Griffon - Codehaus',       url: 'http://repository.codehaus.org'
+            mavenRepo name: 'Griffon - SpringSource',   url: 'http://repository.springsource.com/maven/bundles/release'
+            mavenRepo name: 'Griffon - Sonatype',       url: 'http://repository.sonatype.org/content/groups/public'
+            mavenRepo name: 'Griffon - Grails Central', url: 'http://repo.grails.org/grails/core/'
+        }
+        
         project.dependencies {
             ["rt", "cli", "scripts", "resources"].each {
                 bootstrap("org.codehaus.griffon:griffon-$it:${project.griffonVersion}") {
@@ -55,7 +62,7 @@ class GriffonPlugin implements Plugin<Project> {
         }
 
         project.task("assemble", type: GriffonTask, overwrite: true) {
-            command pluginProject ? "package-plugin" : "package"
+            command "package"
             configuration "compile"
         }
         

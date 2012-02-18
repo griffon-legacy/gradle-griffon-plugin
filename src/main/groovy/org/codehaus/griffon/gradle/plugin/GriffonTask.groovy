@@ -94,7 +94,7 @@ class GriffonTask extends DefaultTask {
         def result = createLauncher().launch(*launchArgs)
 
         if (result != 0) {
-            throw new RuntimeException("[GriffonPlugin] Griffon returned non-zero value: " + retval);
+            throw new RuntimeException("[GriffonPlugin] Griffon returned non-zero value: " + result)
         }
     }
     
@@ -146,12 +146,8 @@ class GriffonTask extends DefaultTask {
         }
     }
     
-    boolean isEffectiveUseRuntimeClasspathForBootstrap() {
-        effectiveCommand in ["run-app", "test-app", "release-plugin"] || useRuntimeClasspathForBootstrap
-    }
-    
     Configuration getEffectiveBootstrapConfiguration() {
-         project.configurations."${effectiveUseRuntimeClasspathForBootstrap ? 'bootstrapRuntime' : 'bootstrap'}"
+         project.configurations.bootstrap
     }
     
     protected Collection<URL> getEffectiveBootstrapClasspath() {
@@ -164,11 +160,12 @@ class GriffonTask extends DefaultTask {
         def rootLoader = new RootLoader(getEffectiveBootstrapClasspath() as URL[], ClassLoader.systemClassLoader)
         def griffonLauncher = new GriffonLauncher(rootLoader, effectiveGriffonHome, project.projectDir.absolutePath)
         applyProjectLayout(griffonLauncher)
-        configureGriffonDependencyManagement(griffonLauncher)
+        griffonLauncher.dependenciesExternallyConfigured = true
         griffonLauncher
     }
     
     protected void applyProjectLayout(GriffonLauncher griffonLauncher) {
+        griffonLauncher.buildDependencies = project.configurations.bootstrap.files as List
         griffonLauncher.compileDependencies = project.configurations.compile.files as List
         griffonLauncher.testDependencies = project.configurations.test.files as List
         griffonLauncher.runtimeDependencies = project.configurations.runtime.files as List
@@ -178,21 +175,6 @@ class GriffonTask extends DefaultTask {
         griffonLauncher.resourcesDir = new File(project.buildDir, "resources")
         griffonLauncher.projectPluginsDir = new File(project.buildDir, "plugins")
         griffonLauncher.testReportsDir = new File(project.buildDir, "test-results")
-    }
-
-    protected void configureGriffonDependencyManagement(GriffonLauncher griffonLauncher) {
-        // Griffon 1.2+ only. Previous versions of Griffon don't have the
-        // 'dependenciesExternallyConfigured' property. Note that this
-        // is a HACK because the 'settings' field is private.
-        //
-        // We can't simply check whether the property exists on the
-        // launcher because it's the 1.2 version, whereas the project may
-        // be using Griffon version 1.1. That's why we have to get hold
-        // of the actual BuildSettings instance.
-        // def buildSettings = griffonLauncher.settings
-        // if (buildSettings.metaClass.hasProperty(buildSettings, "dependenciesExternallyConfigured")) {
-        //     griffonLauncher.dependenciesExternallyConfigured = true
-        // }
     }
     
     protected void logClasspaths() {
@@ -208,5 +190,9 @@ class GriffonTask extends DefaultTask {
     
     protected boolean isPluginProject() {
         project.projectDir.listFiles({ dir, name -> name ==~ /.*GriffonPlugin.groovy/} as FilenameFilter)
+    }
+    
+    protected boolean isArchetypeProject() {
+        project.projectDir.listFiles({ dir, name -> name ==~ /.*GriffonArchetype.groovy/} as FilenameFilter)
     }
 }

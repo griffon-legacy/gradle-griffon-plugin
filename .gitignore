@@ -1,3 +1,7 @@
 .gradle/
 build/
 gradlew*
+.idea
+gradle-griffon-plugin.iml
+gradle-griffon-plugin.ipr
+gradle-griffon-plugin.iws

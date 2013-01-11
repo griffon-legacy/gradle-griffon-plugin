@@ -15,11 +15,11 @@ This plugin for Gradle allows you to build Griffon projects. To use it, simply i
 
 	    dependencies {
 	        classpath('org.codehaus.griffon:gradle-griffon-plugin:1.1.0')
-	        classpath('org.codehaus.griffon:griffon-scripts:0.9.5')
+	        classpath('org.codehaus.griffon:griffon-scripts:1.2.0')
 	    }
 	}
 
-	griffonVersion = '0.9.5'
+	ext.griffonVersion = '1.2.0'
 	version = '0.1'
 
 	apply plugin: 'griffon'
@@ -41,14 +41,15 @@ Once you have this build file, you can create a Griffon application with the 'in
 
 Other standard tasks include:
 
-* clean
-* compile
-* test
-* assemble
+ * clean
+ * compile
+ * run-app
+ * test
+ * assemble
 
-You can also access any Griffon command by prefixing it with 'griffon-'. For example, to run the application:
+You can also access any Griffon command by prefixing it with 'griffon-'. For example, to launch the application with Java Webstart:
 
-    gradle griffon-run-app
+    gradle griffon-run-webstart
 
 If you want to pass in some arguments, you can do so via the `args` project property:
 

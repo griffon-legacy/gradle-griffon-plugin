@@ -56,6 +56,16 @@ class GriffonPlugin implements Plugin<Project> {
 
         project.task("clean", type: GriffonTask, overwrite: true)
 
+        project.task("compile", type: GriffonTask, overwrite: true) {
+            command "compile"
+            configurations "compile"
+        }
+
+        project.task("run-app", type: GriffonTask, overwrite: true) {
+            command "run-app"
+            configurations "runtime"
+        }
+
         project.task("test", type: GriffonTask, overwrite: true) {
             command "test-app"
             configurations "compile", "test"

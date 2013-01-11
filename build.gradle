@@ -2,7 +2,13 @@ apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'idea'
 
-isSnapshot = version.endsWith("SNAPSHOT")
+ext {
+    isSnapshot = version.endsWith('SNAPSHOT')
+    poms = [install.repositories.mavenInstaller.pom]
+    pomModifications = []
+    modifyPom = { Closure modification -> pomModifications << modification }
+    deployer = null
+}
 
 repositories {
     mavenCentral()
@@ -11,15 +17,14 @@ repositories {
 
 dependencies {
     compile gradleApi(),
-        "org.codehaus.griffon:griffon-launcher:$griffonLauncherVersion"
+            "org.codehaus.griffon:griffon-launcher:$griffonLauncherVersion"
     groovy "org.codehaus.groovy:groovy-all:$groovyVersion"
 }
 
-project.poms = [project.install.repositories.mavenInstaller.pom]
 uploadArchives {
     project.deployer = repositories.mavenDeployer {
-        def username = project.properties["codehausUsername"] ?: ''
-        def password = project.properties["codehausPassword"] ?: ''
+        def username = project.properties['codehausUsername'] ?: ''
+        def password = project.properties['codehausPassword'] ?: ''
 
         uploadDescriptor = true
         repository(url: codehausReleaseUrl) {
@@ -30,13 +35,11 @@ uploadArchives {
             authentication(userName: username, password: password)
         }
     }
-    project.poms << project.deployer.pom
+    poms << deployer.pom
 }
 
-project.pomModifications = []
-project.modifyPom = { Closure modification -> project.pomModifications << modification }
-project.poms*.whenConfigured { pom ->
-    project.pomModifications.each { modification ->
+poms*.whenConfigured { pom ->
+    pomModifications.each { modification ->
         pom.project {
             modification.delegate = delegate
             modification.resolveStrategy = Closure.DELEGATE_FIRST
@@ -45,11 +48,11 @@ project.poms*.whenConfigured { pom ->
     }
 }
 
-project.modifyPom {
-    name "Griffon Gradle plugin"
+modifyPom {
+    name 'Griffon Gradle plugin'
     description project.description
-    url "http://griffon.codehaus.org"
-    inceptionYear "2011"
+    url 'http://griffon.codehaus.org'
+    inceptionYear '2011'
     licenses {
         license {
             name 'The Apache Software License, Version 2.0'
@@ -58,15 +61,15 @@ project.modifyPom {
         }
     }
     scm {
-        url "https://github.com/griffon/griffon-gradle-plugin/"
+        url 'https://github.com/griffon/gradle-griffon-plugin/'
     }
     developers {
-        [aalmiray: "Andres Almiray"].each { devId, devName ->
+        [aalmiray: 'Andres Almiray'].each { devId, devName ->
             developer {
                 id devId
                 name devName
                 roles {
-                    role "Developer"
+                    role 'Developer'
                 }
             }
         }
@@ -74,6 +77,6 @@ project.modifyPom {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.2'
+    gradleVersion = '1.3'
     jarFile = 'gradle/wrapper/gradle-wrapper.jar'
 }
